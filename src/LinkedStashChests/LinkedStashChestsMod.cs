@@ -11,7 +11,7 @@ namespace LinkedStashChests
         public LinkedStashChestsMod()
         {
             ModID = "LinkedStashChests";
-            Version = "2";
+            Version = "3";
             author = "Stian+Laymain";
         }
 
@@ -230,6 +230,7 @@ namespace LinkedStashChests
                     AddSavedStashSilver(savedStashSilver, basicSaveData);
                     ItemManager.Instance.LoadItems(new List<BasicSaveData>(1) {basicSaveData});
                     currentStashItems.AddRange(otherStashItems);
+                    otherAreaSave.ProcessSave();
 
                     otherStashItems = GetSavedStashItems(otherAreaSave, StashAreaToStashUID[areaName]);
                     bufferedLog.AppendLine($"{otherAreaSave.AreaName}'s SAVED stash chest AFTER pulling all its items into {areaName}'s stash chest:");
