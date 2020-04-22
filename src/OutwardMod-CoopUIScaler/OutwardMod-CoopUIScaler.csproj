@@ -1,0 +1,42 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <Import Project="$(SolutionDir)\UserPaths.props" />
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>OutwardMod_CoopUIScaler</RootNamespace>
+        <AssemblyName>OutwardMod_CoopUIScaler</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="Assembly-CSharp">
+        <HintPath>$(OutwardRootPath)\Outward_Data\Managed\Assembly-CSharp.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="HOOKS-Assembly-CSharp">
+        <HintPath>$(OutwardRootPath)\BepInEx\plugins\PartialityWrapper\HOOKS-Assembly-CSharp.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="Partiality">
+        <HintPath>$(OutwardRootPath)\BepInEx\plugins\PartialityWrapper\Partiality.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="UnityEngine">
+        <HintPath>$(OutwardRootPath)\Outward_Data\Managed\UnityEngine.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="UnityEngine.CoreModule">
+        <HintPath>$(OutwardRootPath)\Outward_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="UnityEngine.UI">
+        <HintPath>$(OutwardRootPath)\Outward_Data\Managed\UnityEngine.UI.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+      <Reference Include="UnityEngine.UIModule">
+        <HintPath>$(OutwardRootPath)\Outward_Data\Managed\UnityEngine.UIModule.dll</HintPath>
+        <Private>False</Private>
+      </Reference>
+    </ItemGroup>
+
+</Project>
