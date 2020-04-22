@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 using Partiality.Modloader;
 using UnityEngine;
 
@@ -181,8 +182,8 @@ namespace LinkedStashChests
             }
 
             string areaName = loadedScene.AreaName;
-            List<EnvironmentSave> list = AreasWithExistingStashChests(self, areaName);
-            if (list.Count == 0)
+            List<EnvironmentSave> otherAreaSaves = AreasWithExistingStashChests(self, areaName);
+            if (otherAreaSaves.Count == 0)
             {
                 Debug.Log("Linked Stash Chests: No other stash chests to sync with.");
                 return result;
@@ -195,66 +196,54 @@ namespace LinkedStashChests
                 return result;
             }
 
-            BasicSaveData basicSaveData = null;
-            var list2 = new List<BasicSaveData>();
-            if (self.PathToSceneSaves.ContainsKey(areaName))
+            var bufferedLog = new StringBuilder();
+            try
             {
-                basicSaveData = GetSavedStashChest(loadedScene);
-                list2 = GetSavedStashItems(loadedScene);
-            }
-
-            if (basicSaveData == null)
-            {
-                basicSaveData = new BasicSaveData(treasureChest.UID, treasureChest.ToSaveData());
-            }
-
-            Debug.Log("____________________");
-            Debug.Log("Linked Stash Chests: " + areaName + "'s stash chest BEFORE pulling all other stash chest items into it:");
-            Debug.Log("Linked Stash Chests: " + areaName + "'s stash chest: " + (basicSaveData == null ? "null" : basicSaveData.Identifier + " " + basicSaveData.SyncData));
-            foreach (BasicSaveData basicSaveData2 in list2)
-            {
-                Debug.Log(basicSaveData2.Identifier + " " + basicSaveData2.SyncData);
-            }
-
-            foreach (EnvironmentSave environmentSave in list)
-            {
-                BasicSaveData savedStashChest = GetSavedStashChest(environmentSave);
-                Debug.Log("____________________");
-                Debug.Log(string.Concat("Linked Stash Chests: ", environmentSave.AreaName, "'s SAVED stash chest BEFORE pulling all its items into ", areaName, "'s stash chest:"));
-                Debug.Log("Linked Stash Chests: " + environmentSave.AreaName + "'s SAVED stash chest: " +
-                          (savedStashChest == null ? "null" : savedStashChest.Identifier + " " + savedStashChest.SyncData));
-                foreach (BasicSaveData basicSaveData3 in GetSavedStashItems(environmentSave))
+                BasicSaveData basicSaveData = null;
+                var currentStashItems = new List<BasicSaveData>();
+                if (self.PathToSceneSaves.ContainsKey(areaName))
                 {
-                    Debug.Log(basicSaveData3.Identifier + " " + basicSaveData3.SyncData);
+                    basicSaveData = GetSavedStashChest(loadedScene);
+                    currentStashItems = GetSavedStashItems(loadedScene);
                 }
 
-                List<BasicSaveData> savedStashItems = GetSavedStashItems(environmentSave, StashAreaToStashUID[areaName]);
-                RemoveSavedStashItems(environmentSave);
-                ItemManager.Instance.LoadItems(savedStashItems);
-                int savedStashSilver = GetSavedStashSilver(savedStashChest);
-                SetSavedStashSilver(0, savedStashChest);
-                AddSavedStashSilver(savedStashSilver, basicSaveData);
-                ItemManager.Instance.LoadItems(new List<BasicSaveData>(1)
+                if (basicSaveData == null)
                 {
-                    basicSaveData
-                });
-                Debug.Log($"Linked Stash Chests: {environmentSave.AreaName}'s SAVED stash chest AFTER pulling all its items into {areaName}'s stash chest:");
-                Debug.Log("Linked Stash Chests: " + environmentSave.AreaName + "'s SAVED stash chest: " +
-                          (savedStashChest == null ? "null" : savedStashChest.Identifier + " " + savedStashChest.SyncData));
-                foreach (BasicSaveData basicSaveData4 in GetSavedStashItems(environmentSave, StashAreaToStashUID[areaName]))
-                {
-                    Debug.Log(basicSaveData4.Identifier + " " + basicSaveData4.SyncData);
+                    basicSaveData = new BasicSaveData(treasureChest.UID, treasureChest.ToSaveData());
                 }
 
-                list2.AddRange(savedStashItems);
-            }
+                bufferedLog.AppendLine("--------------------------------- Linked Stash Chests ---------------------------------");
+                bufferedLog.AppendLine($"{areaName}'s stash chest BEFORE pulling all other stash chest items into it:");
+                bufferedLog.AppendLine($"{currentStashItems.Count} items: {basicSaveData.Identifier} {basicSaveData.SyncData}");
+                foreach (EnvironmentSave otherAreaSave in otherAreaSaves)
+                {
+                    BasicSaveData otherStashChest = GetSavedStashChest(otherAreaSave);
+                    List<BasicSaveData> otherStashItems = GetSavedStashItems(otherAreaSave, StashAreaToStashUID[areaName]);
+                    bufferedLog.AppendLine();
+                    bufferedLog.AppendLine($"{otherAreaSave.AreaName}'s SAVED stash chest BEFORE pulling all its items into {areaName}'s stash chest:");
+                    bufferedLog.AppendLine($"{otherStashItems.Count} items: {(otherStashChest == null ? "null" : otherStashChest.Identifier + " " + otherStashChest.SyncData)}");
 
-            Debug.Log("____________________");
-            Debug.Log("Linked Stash Chests: " + areaName + "'s stash chest AFTER pulling all other stash chest items into it:");
-            Debug.Log("Linked Stash Chests: " + areaName + "'s stash chest: " + (basicSaveData == null ? "null" : basicSaveData.Identifier + " " + basicSaveData.SyncData));
-            foreach (BasicSaveData basicSaveData5 in list2)
+                    RemoveSavedStashItems(otherAreaSave);
+                    ItemManager.Instance.LoadItems(otherStashItems);
+                    int savedStashSilver = GetSavedStashSilver(otherStashChest);
+                    SetSavedStashSilver(0, otherStashChest);
+                    AddSavedStashSilver(savedStashSilver, basicSaveData);
+                    ItemManager.Instance.LoadItems(new List<BasicSaveData>(1) {basicSaveData});
+                    currentStashItems.AddRange(otherStashItems);
+
+                    otherStashItems = GetSavedStashItems(otherAreaSave, StashAreaToStashUID[areaName]);
+                    bufferedLog.AppendLine($"{otherAreaSave.AreaName}'s SAVED stash chest AFTER pulling all its items into {areaName}'s stash chest:");
+                    bufferedLog.AppendLine($"{otherStashItems.Count} items): {(otherStashChest == null ? "null" : otherStashChest.Identifier + " " + otherStashChest.SyncData)}");
+                }
+
+                bufferedLog.AppendLine();
+                bufferedLog.AppendLine($"{areaName}'s stash chest AFTER pulling all other stash chest items into it:");
+                bufferedLog.AppendLine($"{currentStashItems.Count} items: {basicSaveData.Identifier + " " + basicSaveData.SyncData}");
+                bufferedLog.AppendLine("---------------------------------------------------------------------------------------");
+            }
+            finally
             {
-                Debug.Log(basicSaveData5.Identifier + " " + basicSaveData5.SyncData);
+                Debug.Log(bufferedLog.ToString());
             }
 
             return result;
