@@ -1,7 +1,7 @@
 ## Outwards mods
 
 * [Linked Stash Chests](src/LinkedStashChests/README.md) _by Stian_
-* [Ultra Widescreen and Co-op UI Fixes](src/LinkedStashChests/README.md) _by SirMuffin9_
+* [Ultra Widescreen and Co-op UI Fixes](src/OutwardMod-CoopUIScaler/README.md) _by SirMuffin9_
 
 ## How to compile
 
