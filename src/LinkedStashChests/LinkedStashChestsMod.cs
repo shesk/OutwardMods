@@ -11,7 +11,7 @@ namespace LinkedStashChests
         public LinkedStashChestsMod()
         {
             ModID = "LinkedStashChests";
-            Version = "3";
+            Version = "4";
             author = "Stian+Laymain";
         }
 
@@ -272,6 +272,10 @@ namespace LinkedStashChests
             },
             {
                 "Monsoon",
+                "ImqRiGAT80aE2WtUHfdcMw"
+            },
+            {
+                "Harmattan",
                 "ImqRiGAT80aE2WtUHfdcMw"
             }
         };
